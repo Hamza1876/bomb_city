@@ -16,18 +16,33 @@ int skor_loc = 40; 			//defines location of skor table
 char kelime[20];		//word near the bomb
 int speed_of_game = 500;	//used in Sleep function to define speed of game
 int speed_flag =0;			//in every 5 true typed word, speed flag will increase 1 time.
-
-
 int word_4=0 ,word_5=0 ,word_6=0 ,word_7=0 ,word_8=0 ,word_9=0 ,word_10=0;
 //those variables are indicating the beginning index of the words which have 4 letters,5 letters etc..
 
-int find_word_length(void){
-		int letter_increment_flag =3;
+
+int findWordNum(){
+	FILE *f;
+	f = fopen("codewords.txt","r");
+	char kelimeHolder[20] ={0};
+	int j = 0;
+	for(j; ; j++){
+		fscanf(f, "%s", kelime);
+		if(strcmp(kelime, kelimeHolder) == 0){
+			break;
+		}
+		sprintf(kelimeHolder, kelime);
+	}
+	fclose(f);
+	return j;
+}
+
+int find_word_length(int wordNum){
+	int letter_increment_flag =3;
 	
 	FILE *word_list;
 	word_list = fopen("codewords.txt","r");
 	int r;
-	for(r=1;r<41;r++){
+	for(r = 1; r < wordNum; r++){
 		fscanf(word_list, "%s", kelime);
 		int y;
 		for(y=0; kelime[y] != NULL; y++);		//ý am finding the length of word
@@ -55,7 +70,7 @@ int find_word_length(void){
 						/////////GET WORD FUNCTÝON/////////
 
 
-int get_word(int s_flag){
+int get_word(int s_flag, int wordNum){
 		
 	FILE *word_list;
 	word_list = fopen("codewords.txt","r");
@@ -81,7 +96,7 @@ int get_word(int s_flag){
 	else if(s_flag < 35){
 		p = rand()%(word_10- word_9) + word_9;
 	}else{
-		p = rand()%(40-word_10) + word_10;
+		p = rand()%(wordNum-word_10) + word_10;
 	}
 		 
 	int r;
@@ -214,7 +229,10 @@ int main( void )
 	srand(time(NULL));
 	int flag=0;	//flag for game menu
 	int k,j,s,u,l,z;		//those will be used for the other "for" loops
-	find_word_length();
+	int filelen;		//number of words in the file
+	filelen = findWordNum();
+	
+	find_word_length(filelen);
 	
 	char c;		//this will be used for kbhit
 	while(1)		//main loop for game
@@ -243,7 +261,7 @@ int main( void )
 			speed_flag= 0;
 			skor_loc = 40;
 			flag =1;
-			get_word(speed_flag);
+			get_word(speed_flag,filelen);
 			
 			system("cls");
 			
@@ -317,7 +335,7 @@ int main( void )
 			
 				b_yatay = u_konum;	//plane is leaving bomb, so horizontal distance of bomb is 
 									// equal to horizontal distance of plane 
-				get_word(speed_flag);	
+				get_word(speed_flag, filelen);	
 				if(speed_flag%5 == 0){		//speed increment for every 5 word 
 					speed_of_game -= 30;
 				}
